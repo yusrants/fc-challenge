@@ -13,7 +13,7 @@ It has the following endpoints:
 ### get /key/id
 ● An endpoint that returns the cached data for a given key
 
-### post /key
+### post /key/id
 ● An endpoint that creates and updates the data for a given key
 
 ### delete /keys
