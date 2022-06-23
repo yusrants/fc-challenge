@@ -3,10 +3,10 @@ const crypto = require('crypto');
 const models = require("./models");
 
 const currentDate = new Date();
-const TTL = 5;
+const TTL_in_seconds = 500;
 const limit = 30;
 
-let isDataExpired = (data) => { return ((data['time_accessed'].getTime() / 1000) + TTL) < (currentDate.getTime() / 1000); }
+let isDataExpired = (data) => { return ((data['time_accessed'].getTime() / 1000) + TTL_in_seconds) < (currentDate.getTime() / 1000); }
 
 let createUser = (key) => new models.User(key)
 
