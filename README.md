@@ -29,7 +29,7 @@ It has the following endpoints:
  ### Connect to DB:
 2.  Create a cluster on mongodb atlas, a new db and collection.
 3. Create an .env file in the root folder and add the following parameters:
-- ATLAS_URI = "mongodb+srv://<username>:<password>@clusterfc.xbigfoo.mongodb.net/?retryWrites=true&w=majority";
+- ATLAS_URI = mongodb+srv://<username>:<password>@clusterfc.xbigfoo.mongodb.net/?retryWrites=true&w=majority;
 - DATABASE = db-name; 
 - COLLECTION = collection-name; 
 
