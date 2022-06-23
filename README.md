@@ -29,9 +29,9 @@ It has the following endpoints:
  ### Connect to DB:
 2.  Create a cluster on mongodb atlas, a new db and collection.
 3. Create an .env file in the root folder and add the following parameters:
-- ATLAS_URI = "mongodb+srv://admin:adminpass@clusterfc.xbigfoo.mongodb.net/?retryWrites=true&w=majority";
-- DATABASE = fc-collection; (You can name your own database)
-- COLLECTION = users_info; (You can name your own collection)
+- ATLAS_URI = "mongodb+srv://<username>:<password>@clusterfc.xbigfoo.mongodb.net/?retryWrites=true&w=majority";
+- DATABASE = db-name; 
+- COLLECTION = collection-name; 
 
 ### Run the following commands
 - cd cache-builder 
