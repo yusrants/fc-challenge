@@ -4,7 +4,7 @@ const models = require("./models");
 
 const currentDate = new Date();
 const TTL_in_seconds = 500;
-const limit = 30;
+const limit = 3000;
 
 let isDataExpired = (data) => { return ((data['time_accessed'].getTime() / 1000) + TTL_in_seconds) < (currentDate.getTime() / 1000); }
 

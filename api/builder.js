@@ -14,8 +14,16 @@ const limit = 50;
 
 async function getAllKeys() {
     const result = await client.db(database).collection(collection).find().toArray();
+    let keys = [];
 
-    if (result) return result;
+    // Extracting keys from the db data
+    for (let i=0; i < result.length; i++)
+    {
+        keys.push(result[i].key);
+    }
+    
+    if (keys) 
+        return keys;
     else 
         return response.notFound;
 }
