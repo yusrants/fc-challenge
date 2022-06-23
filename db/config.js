@@ -1,16 +1,25 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
+// to be replaced
 const uri = "mongodb+srv://admin:adminpass@clusterfc.xbigfoo.mongodb.net/?retryWrites=true&w=majority";
 
-export const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-    try {
-        await client.connect();
-    }
-    catch(e) {
-        console.log(e);
-    }
+module.exports = {
 
-    finally {
-        await client.close(e);
-    }
+connectToDB : () => 
+{
+    client.connect((err,db) => {
+        if (err) 
+            console.log(err);
+        else 
+            console.log("Connected to db")
+        client.close();
+      })
+},
+
+getClient : () => client
+
+}
+
+

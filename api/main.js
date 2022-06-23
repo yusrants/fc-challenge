@@ -18,24 +18,17 @@ async function getUser(key) {
 
     if (result) {
         console.log(`Cache Hit`);
-        return result;
+
     } else {
         console.log(`Cache miss`);
-        let data = helper.getRandomString();
-
     }
 
-    return result;
+    return result['secret'];
 }
 
 async function createUser() {
-    const result = await client.db("fc-collection").collection("users_info").find();
+    let secret = helper.getRandomString();
 
-    if (result) {
-        console.log(result);
-    } else {
-        console.log(`No listings found'`);
-    }
 }
 
 
