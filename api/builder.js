@@ -37,7 +37,7 @@ async function getKey(key) {
         if (helper.isDataExpired(cached_data))
             { 
                 // if the data is expired, replace its content with a random string and return the string
-                return updateTime(key);
+                return updateData(key, null);
             }
         else {
             let updated_data = updateData(key, "Update TTL");
