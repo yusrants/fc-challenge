@@ -10,14 +10,14 @@ class User {
         this.fname = random.first();
         this.lname = random.last();
         this.city = random.place();
-        this.time_created = new Date();
+        this.time_accessed = new Date();
     }
 }
 
 class RandomString {
     constructor(key) {
         this.key = key;
-        this.time_created = new Date();
+        this.time_accessed = new Date();
         this.value = crypto.randomBytes(10).toString('hex');
     }
 

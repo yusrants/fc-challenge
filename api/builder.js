@@ -79,11 +79,9 @@ async function updateData(key, data) {
 
     if (data)
     {
-
         let result = await client.db(database).collection(collection)
         .findOneAndUpdate({ key: key },
             { $unset: { fname: "", lname: "", value: "", city: "" } } , { $set: data});
-
         return result.value;
     }
         
@@ -95,15 +93,15 @@ async function updateData(key, data) {
         
         // return the added string of random characters
         return result.value.value;}
-    
 
 }
 
+// If the key is accessed, update its time_accessed
 async function updateTime (key)
 
     {
         let result = await client.db(database).collection(collection)
-            .findOneAndUpdate({ key: key }, { $set: {time_created: new Date()} });
+            .findOneAndUpdate({ key: key }, { $set: {time_accessed: new Date()} });
         
         return result.value;
     }
@@ -119,7 +117,7 @@ async function addOrUpdateData (key, data){
         }
         else{
             data["key"] = key;
-            data["time_created"] = new Date();
+            data["time_accessed"] = new Date();
             return addData(data);
         }
     

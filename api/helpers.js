@@ -6,7 +6,7 @@ const currentDate = new Date();
 const TTL = 5;
 const limit = 30;
 
-let isDataExpired = (data) => { return ((data['time_created'].getTime() / 1000) + TTL) < (currentDate.getTime() / 1000); }
+let isDataExpired = (data) => { return ((data['time_accessed'].getTime() / 1000) + TTL) < (currentDate.getTime() / 1000); }
 
 let createUser = (key) => new models.User(key)
 
