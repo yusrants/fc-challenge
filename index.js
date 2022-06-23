@@ -10,8 +10,9 @@ app.use(bodyparser.urlencoded({ extended: false }));
 
 
 const builder = require("./api/main");
+const { json } = require('body-parser');
 
-// returns all stored keys in the cache
+// pouplate the db with random data of users
 app.get('/populate', (request, response)=> {
     
     let result = builder.populateDB();
@@ -20,7 +21,7 @@ app.get('/populate', (request, response)=> {
 })
 
 // returns all stored keys data in the cache
-app.get('/users', (request, response)=> {
+app.get('/keys', (request, response)=> {
     
     let users = builder.getAllKeys()
     users.then((data) => response.send(data));
@@ -28,9 +29,9 @@ app.get('/users', (request, response)=> {
 })
 
 // returns cached data for the key
-app.get('/user/:key', (request, response)=> {
+app.get('/key/:id', (request, response)=> {
     
-    let key = request.params.key;
+    let key = request.params.id;
     let result = builder.getKey(key);
 
     result.then( (data) => 
@@ -40,17 +41,23 @@ app.get('/user/:key', (request, response)=> {
 })
 
 // creates and updates the data for a given key
-app.post('/user/:key', (request, response)=> {
+app.post('/key/:id', (request, response)=> {
     
-    let key = request.params.key;
-    console.dir(request.body)  // <==== req.body will be a parsed JSON object
+    let key = request.params.id;
+    let body = request.body;
+    let result = builder.addOrUpdateData(key, body);
+
+    result.then( (data) => 
+    {
+        response.send(data);
+    })
 
 })
 
 //removes a given key from the cache
-app.delete('/user/:key', (request, response)=> {
+app.delete('/key/:id', (request, response)=> {
     
-    let key = request.params.key;
+    let key = request.params.id;
     let deleted = builder.deleteKey(key);
     deleted.then( (data) => 
     {
@@ -59,7 +66,7 @@ app.delete('/user/:key', (request, response)=> {
 })
 
 //removes all keys from the cache
-app.delete('/users', (request, response)=> {
+app.delete('/keys', (request, response)=> {
     
     let deleted = builder.deleteAllKeys();
     deleted.then( (data) => 
