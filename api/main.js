@@ -26,8 +26,7 @@ async function getKey(key) {
         if (helper.isDataExpired(cached_data))
             { 
                 // if the data is expired, replace its content with a random string and return the string
-                let updated_data = updateData(key, null);
-                return updated_data;
+                return updateTime(key);
             }
         else {
             let updated_data = updateData(key, "Update TTL");
@@ -92,18 +91,11 @@ async function addOrUpdateData (key, data){
 }
 async function updateData(key, data) {
 
-    if( data === "Update TTL")
+    if (data)
     {
         let result = await client.db(database).collection(collection)
-            .findOneAndUpdate({ key: key }, { $set: {time_created: new Date()} });
-        
-        return result.value;
-    }
-
-    else if (data)
-    {
-        let result = await client.db(database).collection(collection)
-        .findOneAndUpdate({ key: key }, { $set: data});
+        .findOneAndUpdate({ key: key },
+            { $unset: { fname: "", lname: "", value: "", city: "" } } , { $set: data});
 
         return result.value;
     }
@@ -119,6 +111,15 @@ async function updateData(key, data) {
     
 
 }
+
+async function updateTime (key)
+
+    {
+        let result = await client.db(database).collection(collection)
+            .findOneAndUpdate({ key: key }, { $set: {time_created: new Date()} });
+        
+        return result.value;
+    }
 
 async function deleteKey(key) {
 
