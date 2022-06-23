@@ -2,8 +2,6 @@
 A simple cache builder project that stores data in cache wrt keys. 
 It has the following endpoints:
 
-**endpoint**: "localhost:5000"
-
 ### get /populate
  First of all, fetch this end point to populate the db with random users data
 
