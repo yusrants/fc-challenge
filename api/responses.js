@@ -17,5 +17,8 @@ const modified = {
 const inserted = {
     "SUCCESS 200" : "Inserted data"
 }
+const error = {
+    "ERROR 405": "Action not completed"
+}
 
-module.exports= { notFound, created, success, modified, inserted}
+module.exports= { notFound, created, success, modified, inserted, error}

@@ -50,12 +50,13 @@ async function getKey(key) {
 async function addData(data) {
 
     let new_data = data;
+
     let count = await client.db(database).collection(collection)
         .countDocuments();
 
-        await client.db(database).collection(collection)
+    let inserted = await client.db(database).collection(collection)
         .insertOne(new_data);
-
+   
     /* If the cache has reached its limit, delete the item with the earliest date i.e 
         oldest key in the collction */ 
     if (count > limit)
@@ -68,19 +69,16 @@ async function addData(data) {
                deleteKey(data.key);
             },
           );
-          return response.modified;
-        }
-
-    else {
-        return response.success;}
-
+          
+    }
+    if (inserted.insertedId) return response.inserted;
+    else return response.error;
 }
 
 async function updateData(key, data) {
 
     if (data)
     {
-        data["time_created"] = new Date();
 
         let result = await client.db(database).collection(collection)
         .findOneAndUpdate({ key: key },
@@ -110,17 +108,19 @@ async function updateTime (key)
         return result.value;
     }
 
-    async function addOrUpdateData (key, data){
+
+async function addOrUpdateData (key, data){
         let cached_data = await client.db(database).collection(collection).findOne({key});
     
         if (cached_data)
         {
             updateData(key, data);
-            return({"Success": `One key was modified `});
+            return response.modified;
         }
         else{
-            data["key"] = key
-            addData(data);
+            data["key"] = key;
+            data["time_created"] = new Date();
+            return addData(data);
         }
     
     }
