@@ -1,30 +1,38 @@
 const express = require('express');
 const app = express()
 const cors = require('cors');
+const bodyparser = require('body-parser');
 
+
+app.use(express.json())
 app.use(cors());
+app.use(bodyparser.urlencoded({ extended: false }));
+
 
 const builder = require("./api/main");
 
-// Lets add some dummy data to the db:
-app.get('/', (request, response)=> {
-    response.json({"message": "server is running"});
+// returns all stored keys in the cache
+app.get('/populate', (request, response)=> {
+    
+    let result = builder.populateDB();
+    result.then((data) => response.send(data));
+
 })
 
-// returns all stored keys in the cache
+// returns all stored keys data in the cache
 app.get('/users', (request, response)=> {
     
-    let users = builder.getAllUsers()
-
+    let users = builder.getAllKeys()
     users.then((data) => response.send(data));
 
 })
 
-// returns cached data
+// returns cached data for the key
 app.get('/user/:key', (request, response)=> {
     
     let key = request.params.key;
-    let result = builder.getUser(key);
+    let result = builder.getKey(key);
+
     result.then( (data) => 
     {
         response.send(data);
@@ -35,26 +43,29 @@ app.get('/user/:key', (request, response)=> {
 app.post('/user/:key', (request, response)=> {
     
     let key = request.params.key;
-    response.json(builder.getUser(key));
+    console.dir(request.body)  // <==== req.body will be a parsed JSON object
 
 })
 
 //removes a given key from the cache
-app.delete('/remove/:key', (request, response)=> {
+app.delete('/user/:key', (request, response)=> {
     
     let key = request.params.key;
-    console.log(key)
-
-    response.json(`The key is ${key}`);
+    let deleted = builder.deleteKey(key);
+    deleted.then( (data) => 
+    {
+        response.send(data);
+    })
 })
 
 //removes all keys from the cache
-app.delete('/clear', (request, response)=> {
+app.delete('/users', (request, response)=> {
     
-    let key = request.params.key;
-    console.log(key)
-
-    response.json(`The key is ${key}`);
+    let deleted = builder.deleteAllKeys();
+    deleted.then( (data) => 
+    {
+        response.send(data);
+    })
 })
 
 

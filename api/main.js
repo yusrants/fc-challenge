@@ -1,54 +1,110 @@
 const dbo = require("../db/config");
-const user = require("../api/user");
 const helper = require("../api/helpers");
-
 const client = dbo.getClient();
 
-async function getAllUsers() {
-    const result = await client.db("fc-collection").collection("users_info").find().limit(30).toArray();
+// To be added to env
+const database = "fc-collection";
+const collection = "users_info";
+const limit = 30;
+
+async function getAllKeys() {
+    const result = await client.db(database).collection(collection).find().limit(30).toArray();
 
     if (result) {
         return result;
     } 
+    else return {"Error 404": "No data found"}
 }
 
-async function getUser(key) {
-    let cached_user = await client.db("fc-collection").collection("users_info").findOne({key});
-
-    if (cached_user ) {
+async function getKey(key) {
+    let cached_data = await client.db(database).collection(collection).findOne({key});
+    
+    if (cached_data) {
         console.log(`Cache Hit`);
 
-        if (!helper.isDataExpired(cached_user))
+        if (helper.isDataExpired(cached_data))
             {
-
+                // if the data is expired, replace its content with a random string and return the string
+                let updated_data = updateData(key, null);
+                return updated_data;
             }
-
+        else return cached_data; 
     } 
     else {
         console.log(`Cache miss`);
+        /* If cache misses, insert the key with a random string */
+        let random_string = helper.createRandomString(key);
 
-        /* If cache misses, create a new user with the added key and a random string and return 
-         the secret i.e a random string */
+        // Add the new object to the cache
+        await addData(random_string);
+        return random_string['value'];
+    }
+}
 
-        let add_user = new user.User(key);
-        await createUser(add_user);
-        cached_user = add_user;
+async function addData(data) {
+    const result = await client.db(database).collection(collection).insertOne(data);
+}
+
+async function updateData(key, new_data) {
+
+
+    if (new_data)
+    {   
+        let result = await client.db(database).collection(collection)
+            .findOneAndUpdate({ key: key }, { $set: new_data });
+        
+        return result.value;
+    }
+    else
+    {
+        let random_string = helper.createRandomString(key);
+
+        let result = await client.db(database).collection(collection)
+            .findOneAndUpdate({ key: key }, { $set: random_string });
+        
+        return result.value.value;
+
     }
 
-    return cached_user['secret'];
+}
+
+async function deleteKey(key) {
+
+    const result = await client.db(database).collection(collection)
+            .deleteOne({ key });
+
+        if (result.deletedCount === 1)
+        {
+            return {"Success": `Data with key ${key} not found`}
+        }
+
+        else return {"Error 404": `Data with key ${key} not found`}
+}
+
+async function deleteAllKeys(key) {
+
+    const result = await client.db(database).collection(collection)
+            .deleteMany();
+    
+        if (result.deletedCount > 0)
+            return({"Success": `${result.deletedCount} document(s) was/were deleted.`});
+        else
+        return({"Error": "Not deleted"});
 
 }
 
-async function createUser(user) {
-    const result = await client.db("fc-collection").collection("users_info").insertOne(user);
-    console.log(`New data added`);
+async function populateDB(){
+
+    let users = helper.createRandomUsers();
+    const result = await client.db(database).collection(collection)
+                   .insertMany(users);
+    const count = result.insertedCount
+
+    if (count > 0)
+        return {"Success": `${count} new users(s) created`}
+
+    else 
+        return {"Error ": "Records not added"}
 }
 
-/* async function populateData(){
-    let users = helper.createData();
-    const result = await client.db("fc-collection").collection("users_info").insertMany(users);
-    console.log(`${result.insertedCount} new listing(s) created with the following id(s):`);
-    console.log(result.insertedIds);       
-} */
-
-module.exports = { getUser, createUser, getAllUsers}
+module.exports = { getKey, getAllKeys, addData, deleteKey, deleteAllKeys, populateDB}

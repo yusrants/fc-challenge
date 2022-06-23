@@ -13,7 +13,9 @@ connectToDB : () =>
         if (err) 
             console.log(err);
         else 
-            console.log("Connected to db")
+            {
+                console.log("Connected to db");
+            }
         client.close();
       })
 },
