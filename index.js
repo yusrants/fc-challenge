@@ -6,6 +6,7 @@ app.use(cors());
 
 const builder = require("./api/main");
 
+// Lets add some dummy data to the db:
 app.get('/', (request, response)=> {
     response.json({"message": "server is running"});
 })
@@ -13,7 +14,9 @@ app.get('/', (request, response)=> {
 // returns all stored keys in the cache
 app.get('/users', (request, response)=> {
     
-    let key = request.params.key;
+    let users = builder.getAllUsers()
+
+    users.then((data) => response.send(data));
 
 })
 
@@ -21,8 +24,8 @@ app.get('/users', (request, response)=> {
 app.get('/user/:key', (request, response)=> {
     
     let key = request.params.key;
-    let res = builder.getUser(key);
-    res.then( (data) => 
+    let result = builder.getUser(key);
+    result.then( (data) => 
     {
         response.send(data);
     })
