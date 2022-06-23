@@ -1,14 +1,16 @@
 const dbo = require("../db/config");
 
-const helper = require("../api/helpers");
-const response = require("../api/responses");
+const helper = require("./helpers");
+const response = require("./responses");
 const client = dbo.getClient();
 
-// To be added to env
-const database = "fc-collection";
-const collection = "users_info";
-const limit = 30;
-const unset = {value: "", fname:"", lname: "", city: "" }
+require('dotenv').config();
+
+const database = process.env.DATABASE;
+const collection = process.env.COLLECTION;
+
+// Lets limit our cache to 50 entries
+const limit = 50;
 
 async function getAllKeys() {
     const result = await client.db(database).collection(collection).find().toArray();
@@ -23,6 +25,7 @@ async function getKey(key) {
     
     if (cached_data) {
         console.log(`Cache Hit`);
+
         if (helper.isDataExpired(cached_data))
             { 
                 // if the data is expired, replace its content with a random string and return the string
@@ -50,7 +53,10 @@ async function addData(data) {
     let count = await client.db(database).collection(collection)
         .countDocuments();
 
-    /* If the cache has reached its limit, replace the item with the earliest date i.e 
+        await client.db(database).collection(collection)
+        .insertOne(new_data);
+
+    /* If the cache has reached its limit, delete the item with the earliest date i.e 
         oldest key in the collction */ 
     if (count > limit)
     {
@@ -59,40 +65,23 @@ async function addData(data) {
             {},
             { sort: { datetime: -1 } },
             (err, data) => {
-               key = data.key;
-               updateData(key,new_data)
+               deleteKey(data.key);
             },
           );
           return response.modified;
         }
 
     else {
-        await client.db(database).collection(collection)
-        .insertOne(new_data);
-
         return response.success;}
 
 }
 
-async function addOrUpdateData (key, data){
-    let cached_data = await client.db(database).collection(collection).findOne({key});
-    data["time_created"] = new Date();
-
-    if (cached_data)
-    {
-        updateData(key, data);
-        return({"Success": `One key was modified `});
-    }
-    else{
-        data["key"] = key
-        addData(data);
-    }
-
-}
 async function updateData(key, data) {
 
     if (data)
     {
+        data["time_created"] = new Date();
+
         let result = await client.db(database).collection(collection)
         .findOneAndUpdate({ key: key },
             { $unset: { fname: "", lname: "", value: "", city: "" } } , { $set: data});
@@ -121,6 +110,21 @@ async function updateTime (key)
         return result.value;
     }
 
+    async function addOrUpdateData (key, data){
+        let cached_data = await client.db(database).collection(collection).findOne({key});
+    
+        if (cached_data)
+        {
+            updateData(key, data);
+            return({"Success": `One key was modified `});
+        }
+        else{
+            data["key"] = key
+            addData(data);
+        }
+    
+    }
+
 async function deleteKey(key) {
 
     const result = await client.db(database).collection(collection)
@@ -128,10 +132,10 @@ async function deleteKey(key) {
 
         if (result.deletedCount === 1)
         {
-            return {"Success": `Data with key ${key} not found`}
+            return {"Success": `Data with key ${key} deleted`}
         }
 
-        else return {"Error 404": `Data with key ${key} not found`}
+        else return response.notFound
 }
 
 async function deleteAllKeys(key) {
@@ -154,7 +158,7 @@ async function populateDB(){
     const count = result.insertedCount
 
     if (count > 0)
-        return {"Success": `${count} new keys(s) created`}
+        return {"SUCCESS 200": `${count} new keys(s) created`}
 
     else 
         return {"Error ": "Records not added"}

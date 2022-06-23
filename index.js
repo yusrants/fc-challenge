@@ -9,10 +9,10 @@ app.use(cors());
 app.use(bodyparser.urlencoded({ extended: false }));
 
 
-const builder = require("./api/main");
+const builder = require("./api/builder");
 const { json } = require('body-parser');
 
-// pouplate the db with random data of users
+// pouplates the db with random data of users
 app.get('/populate', (request, response)=> {
     
     let result = builder.populateDB();
@@ -23,8 +23,8 @@ app.get('/populate', (request, response)=> {
 // returns all stored keys data in the cache
 app.get('/keys', (request, response)=> {
     
-    let users = builder.getAllKeys()
-    users.then((data) => response.send(data));
+    let keys = builder.getAllKeys()
+    keys.then((data) => response.send(data));
 
 })
 

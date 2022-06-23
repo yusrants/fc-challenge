@@ -1,7 +1,7 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
+require('dotenv').config();
 
-// to be replaced
-const uri = "mongodb+srv://admin:adminpass@clusterfc.xbigfoo.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.ATLAS_URI;
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
