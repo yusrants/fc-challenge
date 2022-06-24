@@ -40,7 +40,7 @@ async function getKey(key) {
                 return updateData(key, null);
             }
         else {
-            let updated_data = updateData(key, "Update TTL");
+            let updated_data = updateTime(key);
             return updated_data;
         }
     } 
